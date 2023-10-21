@@ -1,0 +1,8 @@
+- Fetches all the podcast episodes from the specified feed
+  -- Possible to provide an option to specify how many last episodes should be fetched
+  -- Download progress is shown (x ouf of y downloaded, and percent of downloaded of overall episodes)
+
+- Possible to add/remove podcasts feed addresses
+- Possible to update all the feeds: the missing episodes are downloaded
+  -- Possible to specify after which dates the episodes should be downloaded
+- Possible to list the most recent episodes
