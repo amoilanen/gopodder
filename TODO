@@ -6,3 +6,5 @@
 - Possible to update all the feeds: the missing episodes are downloaded
   -- Possible to specify after which dates the episodes should be downloaded
 - Possible to list the most recent episodes
+
+- Produce an executable for Linux, Windows, MacOS/make sure that the cli tool can be installed
