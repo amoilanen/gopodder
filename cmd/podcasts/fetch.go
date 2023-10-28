@@ -15,9 +15,18 @@ var fetchCmd = &cobra.Command{
 	Run:   runFetchCmd,
 }
 
+var useTitlesAsFileNames bool
+var downloadDirectory string
+
+func init() {
+	fetchCmd.Flags().BoolVarP(&useTitlesAsFileNames, "titles-as-file-names", "t", false, "Specifies that episode titles should be used as file names when downloading episodes")
+	fetchCmd.Flags().StringVarP(&downloadDirectory, "download-dir", "d", "~/.gopodder", "Directory where the episodes should be saved")
+}
+
 func runFetchCmd(ccmd *cobra.Command, args []string) {
 	//TODO: Implement fetching the episodes and also checking which episodes have already been fetched
 	println("Fetching feed...")
+	println(fmt.Sprintf("use titles as file names = %t, download directory = %s", useTitlesAsFileNames, downloadDirectory))
 	feedUrl := args[0]
 	feedReader := feed.FeedReader{}
 	feed, err := feedReader.GetFeed(feedUrl)
