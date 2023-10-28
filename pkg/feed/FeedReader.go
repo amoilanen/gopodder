@@ -1,4 +1,4 @@
-package podcasts
+package feed
 
 import (
 	"encoding/xml"

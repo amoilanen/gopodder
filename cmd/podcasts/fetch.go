@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/amoilanen/gopodder/pkg/feed"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,7 @@ func runFetchCmd(ccmd *cobra.Command, args []string) {
 	//TODO: Implement fetching the episodes and also checking which episodes have already been fetched
 	println("Fetching feed...")
 	feedUrl := args[0]
-	feedReader := FeedReader{}
+	feedReader := feed.FeedReader{}
 	feed, err := feedReader.GetFeed(feedUrl)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
