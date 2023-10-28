@@ -6,6 +6,7 @@ import (
 
 func init() {
 	PodcastsCmd.AddCommand(fetchCmd)
+	PodcastsCmd.AddCommand(addCmd)
 }
 
 var PodcastsCmd = &cobra.Command{

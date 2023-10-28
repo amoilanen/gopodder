@@ -27,6 +27,7 @@ func runFetchCmd(ccmd *cobra.Command, args []string) {
 	//TODO: Implement fetching the episodes and also checking which episodes have already been fetched
 	println("Fetching feed...")
 	println(fmt.Sprintf("use titles as file names = %t, download directory = %s", useTitlesAsFileNames, downloadDirectory))
+	//TODO: Create downloadDirectory if it does not exist
 	feedUrl := args[0]
 	feedReader := feed.FeedReader{}
 	feed, err := feedReader.GetFeed(feedUrl)
