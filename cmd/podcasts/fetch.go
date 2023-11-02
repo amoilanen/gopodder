@@ -19,8 +19,8 @@ var useTitlesAsFileNames bool
 var downloadDirectory string
 
 func init() {
-	fetchCmd.Flags().BoolVarP(&useTitlesAsFileNames, "titles-as-file-names", "t", false, "Specifies that episode titles should be used as file names when downloading episodes")
-	fetchCmd.Flags().StringVarP(&downloadDirectory, "download-dir", "d", "~/.gopodder", "Directory where the episodes should be saved")
+	fetchCmd.Flags().BoolVarP(&useTitlesAsFileNames, "titles-as-file-names", "t", true, "Specifies that episode titles should be used as file names when downloading episodes")
+	fetchCmd.Flags().StringVarP(&downloadDirectory, "download-dir", "d", "~/gopodder", "Directory where the episodes should be saved")
 }
 
 func runFetchCmd(ccmd *cobra.Command, args []string) {

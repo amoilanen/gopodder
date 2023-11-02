@@ -1,8 +1,11 @@
 package podcasts
 
 import (
+	"github.com/amoilanen/gopodder/pkg/config"
+	"github.com/amoilanen/gopodder/pkg/feed"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 var addCmd = &cobra.Command{
@@ -12,22 +15,56 @@ var addCmd = &cobra.Command{
 	Run:   runAddCmd,
 }
 
-func uniqueOf(values []string) []string {
-	uniqueMap := map[string]bool{}
+func uniqueFeedConfigs(values []config.FeedConfig) []config.FeedConfig {
+	uniqueMap := map[string]config.FeedConfig{}
 	for _, value := range values {
-		uniqueMap[value] = true
+		uniqueMap[value.Feed] = value
 	}
-	unique := []string{}
+	unique := []config.FeedConfig{}
 	for value := range uniqueMap {
-		unique = append(unique, value)
+		unique = append(unique, uniqueMap[value])
 	}
 	return unique
 }
 
+func createFeedConfig(feedUrl string) config.FeedConfig {
+	feedReader := feed.FeedReader{}
+	feed, err := feedReader.GetFeed(feedUrl)
+	if err != nil {
+		panic(err)
+	}
+	return config.FeedConfig{
+		Name: feed.Title,
+		Feed: feedUrl,
+	}
+}
+
+func readFeedConfigs() []config.FeedConfig {
+	savedFeedConfigs := []config.FeedConfig{}
+	err := viper.UnmarshalKey("feeds", &savedFeedConfigs)
+	if err != nil {
+		panic(err)
+	}
+	return savedFeedConfigs
+}
+
+func writeFeedConfigs(feedConfigs []config.FeedConfig) {
+	var yamlData []byte
+	yamlData, err := yaml.Marshal(&feedConfigs)
+	if err != nil {
+		panic(err)
+	}
+	viper.Set("feeds", string(yamlData))
+	err = viper.WriteConfig()
+	if err != nil {
+		panic(err)
+	}
+}
+
 func runAddCmd(ccmd *cobra.Command, args []string) {
 	feedUrl := args[0]
-	savedPodcasts := viper.GetStringSlice("feeds")
-	updated := append(savedPodcasts, feedUrl)
-	viper.Set("feeds", uniqueOf(updated))
-	viper.WriteConfig()
+	newFeedConfig := createFeedConfig(feedUrl)
+	savedFeedConfigs := readFeedConfigs()
+	updatedFeeds := uniqueFeedConfigs(append(savedFeedConfigs, newFeedConfig))
+	writeFeedConfigs(updatedFeeds)
 }

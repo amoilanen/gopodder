@@ -8,6 +8,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+type FeedConfig struct {
+	Name string `yaml:"name"`
+	Feed string `yaml:"feed"`
+}
+
 func InitViper() {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -24,7 +29,7 @@ func InitViper() {
 		os.MkdirAll(configPath, 0700)
 	}
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		viper.SetDefault("feeds", []string{})
+		viper.SetDefault("feeds", []FeedConfig{})
 		err = viper.SafeWriteConfigAs(configFile)
 		if err != nil {
 			panic(fmt.Errorf("Could not write default config file: %w", err))
