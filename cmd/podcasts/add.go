@@ -41,7 +41,8 @@ func createFeedConfig(feedUrl string) config.FeedConfig {
 
 func readFeedConfigs() []config.FeedConfig {
 	savedFeedConfigs := []config.FeedConfig{}
-	err := viper.UnmarshalKey("feeds", &savedFeedConfigs)
+	feedData := viper.GetString("feeds")
+	err := yaml.Unmarshal([]byte(feedData), &savedFeedConfigs)
 	if err != nil {
 		panic(err)
 	}
@@ -64,7 +65,7 @@ func writeFeedConfigs(feedConfigs []config.FeedConfig) {
 func runAddCmd(ccmd *cobra.Command, args []string) {
 	feedUrl := args[0]
 	newFeedConfig := createFeedConfig(feedUrl)
-	savedFeedConfigs := readFeedConfigs()
-	updatedFeeds := uniqueFeedConfigs(append(savedFeedConfigs, newFeedConfig))
-	writeFeedConfigs(updatedFeeds)
+	currentFeedConfigs := readFeedConfigs()
+	updatedFeedConfigs := uniqueFeedConfigs(append(currentFeedConfigs, newFeedConfig))
+	writeFeedConfigs(updatedFeedConfigs)
 }
