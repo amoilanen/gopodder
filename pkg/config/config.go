@@ -6,11 +6,51 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 type FeedConfig struct {
 	Name string `yaml:"name"`
 	Feed string `yaml:"feed"`
+}
+
+func uniqueFeedConfigs(values []FeedConfig) []FeedConfig {
+	uniqueMap := map[string]FeedConfig{}
+	for _, value := range values {
+		uniqueMap[value.Feed] = value
+	}
+	unique := []FeedConfig{}
+	for value := range uniqueMap {
+		unique = append(unique, uniqueMap[value])
+	}
+	return unique
+}
+
+func AppendUniqueFeedConfig(feedConfigs []FeedConfig, feedConfig FeedConfig) []FeedConfig {
+	return uniqueFeedConfigs(append(feedConfigs, feedConfig))
+}
+
+func ReadFeedConfigs() []FeedConfig {
+	savedFeedConfigs := []FeedConfig{}
+	feedData := viper.GetString("feeds")
+	err := yaml.Unmarshal([]byte(feedData), &savedFeedConfigs)
+	if err != nil {
+		panic(err)
+	}
+	return savedFeedConfigs
+}
+
+func WriteFeedConfigs(feedConfigs []FeedConfig) {
+	var yamlData []byte
+	yamlData, err := yaml.Marshal(&feedConfigs)
+	if err != nil {
+		panic(err)
+	}
+	viper.Set("feeds", string(yamlData))
+	err = viper.WriteConfig()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func InitViper() {
