@@ -1,15 +1,22 @@
 - Fetches all the podcast episodes from the specified feed
   -- Download progress is shown (x ouf of y downloaded, and percent of downloaded of overall episodes)
   -- By default episodes are stored under ~/.rpodder/episodes, possible to provide an option to store in another folder
-  -- Possible to provide an option to specify how many last episodes should be fetched
+  -- Option to specify how many last episodes should be fetched
+  -- Option to specify since when the episodes should be fetched
+  -- Already downloaded episodes should not be downloaded
   -- By default episodes are downloaded under the names of the mp3 files which are linked in the RSS feed, 
      "--use-episode-titles" flag will result in the files stored under their own titles
 
+- Possible to resume a paused/partial download? Similar to wget -c?
+
 - Possible to add/remove podcasts feed addresses - OK
 - Possible to run "clean" will remove all the downloaded episodes, possible to give clean and option of i.e. "leave-last-week-episodes"
+
+-- Possible to specify how much of the download progress feedback should be shown
 
 - Possible to update all the feeds: the missing episodes are downloaded
   -- Possible to specify after which dates the episodes should be downloaded
 - Possible to list the most recent episodes
 
 - Produce an executable for Linux, Windows, MacOS/make sure that the cli tool can be installed
+- Get rid of the direct "panic" calls
