@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
@@ -28,6 +29,23 @@ func uniqueFeedConfigs(values []FeedConfig) []FeedConfig {
 
 func AppendUniqueFeedConfig(feedConfigs []FeedConfig, feedConfig FeedConfig) []FeedConfig {
 	return uniqueFeedConfigs(append(feedConfigs, feedConfig))
+}
+
+func OmitFeedConfigsMatching(feedConfigs []FeedConfig, matchBy string) []FeedConfig {
+	matchByRegex, err := regexp.Compile(matchBy)
+	if err != nil {
+		matchByRegex = nil
+	}
+	result := []FeedConfig{}
+	for _, config := range feedConfigs {
+		matches := config.Name == matchBy ||
+			config.Feed == matchBy ||
+			(matchByRegex != nil && len(matchByRegex.FindStringIndex(config.Name)) > 0)
+		if !matches {
+			result = append(result, config)
+		}
+	}
+	return result
 }
 
 func ReadFeedConfigs() []FeedConfig {

@@ -5,7 +5,9 @@
   -- By default episodes are downloaded under the names of the mp3 files which are linked in the RSS feed, 
      "--use-episode-titles" flag will result in the files stored under their own titles
 
-- Possible to add/remove podcasts feed addresses
+- Possible to add/remove podcasts feed addresses - OK
+- Possible to run "clean" will remove all the downloaded episodes, possible to give clean and option of i.e. "leave-last-week-episodes"
+
 - Possible to update all the feeds: the missing episodes are downloaded
   -- Possible to specify after which dates the episodes should be downloaded
 - Possible to list the most recent episodes
