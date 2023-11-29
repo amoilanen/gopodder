@@ -21,6 +21,7 @@ var fetchCmd = &cobra.Command{
 	Run:   runFetchCmd,
 }
 
+// TODO: Respect this flag and use different file names based on it
 var useTitlesAsFileNames bool
 var downloadDirectory string
 
@@ -35,7 +36,7 @@ func init() {
 	fetchCmd.Flags().StringVarP(&downloadDirectory, "download-dir", "d", defaultDownloadDirectory, "Directory where the episodes should be saved")
 }
 
-// TODO: Extract downloadFile into a separate package
+// TODO: Extract downloadFile into a separate package, should it be a part of the HttpClient module?
 func downloadFile(url, outputPath string) error {
 	response, err := http.Get(url)
 	if err != nil {

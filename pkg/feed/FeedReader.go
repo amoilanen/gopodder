@@ -27,6 +27,7 @@ type RssFeed struct {
 type FeedReader struct {
 }
 
+// TODO: Extract a method/Http client?
 func getBytesFromUrl(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {

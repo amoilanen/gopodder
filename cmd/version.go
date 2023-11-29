@@ -11,6 +11,6 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version number of gopodder",
 	Long:  "Print the version number of gopodder",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("gopodder podcase fetching client v0.0.1")
+		fmt.Println("gopodder podcast fetching client v0.0.1")
 	},
 }

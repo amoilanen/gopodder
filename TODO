@@ -20,3 +20,5 @@
 
 - Produce an executable for Linux, Windows, MacOS/make sure that the cli tool can be installed
 - Get rid of the direct "panic" calls
+- Add tests
+- Use a logging library for printing progress output?
