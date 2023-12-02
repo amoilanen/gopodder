@@ -2,8 +2,8 @@ package feed
 
 import (
 	"encoding/xml"
-	"io"
-	"net/http"
+
+	"github.com/amoilanen/gopodder/pkg/http"
 )
 
 type RssItemEnclosure struct {
@@ -27,22 +27,9 @@ type RssFeed struct {
 type FeedReader struct {
 }
 
-// TODO: Extract a method/Http client?
-func getBytesFromUrl(url string) ([]byte, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return respBody, nil
-}
-
 func (r *FeedReader) GetFeed(feedUrl string) (*RssFeed, error) {
-	respBody, err := getBytesFromUrl(feedUrl)
+	httpClient := http.HttpClient{}
+	respBody, err := httpClient.GetBytesFromUrl(feedUrl)
 	if err != nil {
 		return nil, err
 	}
