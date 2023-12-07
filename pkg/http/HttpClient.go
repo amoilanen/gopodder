@@ -65,11 +65,16 @@ func (r *HttpClient) DownloadFile(url, outputPath string) error {
 	}
 	defer response.Body.Close()
 
+	needToDownload := true
+	contentLength := response.ContentLength
+	fullDownloadSize := contentLength
 	if existsNonEmptyOutput {
 		if response.StatusCode == http.StatusPartialContent {
 			fmt.Printf("Resuming download of file %s, current size %d\n", outputPath, currentOutputSize)
+			fullDownloadSize = contentLength + currentOutputSize
 		} else if response.StatusCode == http.StatusOK {
 			fmt.Printf("Already fully downloaded %s\n", outputPath)
+			needToDownload = false
 		} else {
 			fmt.Printf("Removing partially downloaded file = %s since server does not support resuming downloads\n", outputPath)
 			err := os.Remove(outputPath)
@@ -82,10 +87,9 @@ func (r *HttpClient) DownloadFile(url, outputPath string) error {
 			return fmt.Errorf("HTTP request failed with status code %d", response.StatusCode)
 		}
 	}
-	contentLength := response.ContentLength
 
-	if contentLength > currentOutputSize {
-		progressBar := NewDownloadProgressBar(contentLength)
+	if needToDownload {
+		progressBar := NewDownloadProgressBar(fullDownloadSize)
 		progressBar.OnProgress(currentOutputSize)
 		writer := io.MultiWriter(outFile, progressBar)
 		_, err = io.Copy(writer, response.Body)
