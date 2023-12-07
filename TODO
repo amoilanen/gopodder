@@ -1,4 +1,5 @@
 - Possible to add/remove podcasts feed addresses - OK
+- Possible to resume a paused/partial download? Similar to wget -c? - OK
 
 - Fetches all the podcast episodes from the specified feed
   -- Download progress is shown (x ouf of y downloaded, and percent of downloaded of overall episodes)
@@ -8,8 +9,6 @@
   -- Already downloaded episodes should not be downloaded
   -- By default episodes are downloaded under the names of the mp3 files which are linked in the RSS feed
      "--use-episode-titles" flag will result in the files stored under their own titles
-
-- Possible to resume a paused/partial download? Similar to wget -c?
 
 - Possible to run "clean" will remove all the downloaded episodes, possible to give clean and option of i.e. "leave-last-week-episodes"
 
