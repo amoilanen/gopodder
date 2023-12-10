@@ -6,7 +6,7 @@
   -- By default episodes are stored under ~/.rpodder/episodes, possible to provide an option to store in another folder
   -- Option to specify how many last episodes should be fetched
   -- Option to specify since when the episodes should be fetched
-  -- Already downloaded episodes should not be downloaded
+  -- Already downloaded episodes should not be downloaded - OK
   -- By default episodes are downloaded under the names of the mp3 files which are linked in the RSS feed
      "--use-episode-titles" flag will result in the files stored under their own titles
 
