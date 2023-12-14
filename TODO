@@ -11,6 +11,7 @@
      "--use-episode-titles" flag will result in the files stored under their own titles
 
 - Possible to run "clean" will remove all the downloaded episodes, possible to give clean and option of i.e. "leave-last-week-episodes"
+- Possible to specify where to copy the most recently downloaded episodes: convenient for transferring to a device
 
 -- Possible to specify how much of the download progress feedback should be shown
 
