@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/amoilanen/gopodder/pkg/config"
 	"github.com/amoilanen/gopodder/pkg/feed"
 	"github.com/amoilanen/gopodder/pkg/http"
 	"github.com/spf13/cobra"
@@ -51,6 +52,8 @@ func parseTime(timeInput string) time.Time {
 	return parsedDate
 }
 
+//TODO: Add option last-week, last-month, last-year, today?
+
 func init() {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -66,41 +69,73 @@ func init() {
 	fetchCmd.Flags().StringVarP(&toTime, "end-time", "e", defaultToTime, "End timestamp before which the episodes should be fetched")
 }
 
-// TODO: Implement fetching all the configured feeds if no argument is provided
-func runFetchCmd(ccmd *cobra.Command, args []string) {
-	afterTime := parseTime(fromTime)
-	fmt.Printf("Downloading after %s\n", afterTime.Format(time.RFC3339))
-	untilTime := parseTime(toTime)
-	fmt.Printf("Downloading before %s\n", untilTime.Format(time.RFC3339))
-	println("Fetching feed...")
-	feedUrl := args[0]
+type FeedEpisodesToFetch struct {
+	episodes  []*feed.RssItem
+	feedTitle string
+}
+
+// TODO: Move some of the more detailed code into a separate module for fetching feeds? FeedFetcher?
+func prepareFeedEpisodesFetch(feedUrl string, fromTime time.Time, toTime time.Time) FeedEpisodesToFetch {
 	feedReader := feed.FeedReader{}
-	httpClient := http.HttpClient{}
-	feed, err := feedReader.GetFeed(feedUrl)
+	parsedFeed, err := feedReader.GetFeed(feedUrl)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	feedPath := filepath.Join(downloadDirectory, feed.Title)
-	if _, err := os.Stat(feedPath); os.IsNotExist(err) {
-		os.MkdirAll(feedPath, 0700)
-	}
-	//TODO: Show the overall progress, which episode of how many episodes is being downloaded, etc.
-	for _, episode := range feed.Items {
+	episodesToFetch := []*feed.RssItem{}
+	for _, episode := range parsedFeed.Items {
 		episodeDate, err := time.Parse(time.RFC1123, episode.PubDate)
 		if err != nil {
 			panic(err)
 		}
-		if episodeDate.After(afterTime) && episodeDate.Before(untilTime) {
+		if episodeDate.After(fromTime) && episodeDate.Before(toTime) {
+			episodesToFetch = append(episodesToFetch, episode)
+		}
+	}
+	return FeedEpisodesToFetch{episodesToFetch, parsedFeed.Title}
+}
+
+func prepareEpisodesFetchForFeeds(feedUrls []string, fromTime time.Time, toTime time.Time) []FeedEpisodesToFetch {
+	allEpisodesToFetch := []FeedEpisodesToFetch{}
+	for _, feedUrl := range feedUrls {
+		allEpisodesToFetch = append(allEpisodesToFetch, prepareFeedEpisodesFetch(feedUrl, fromTime, toTime))
+	}
+	return allEpisodesToFetch
+}
+
+// TODO: Fix fetching the "On Point" podcast feed go run main.go podcasts fetch https://rss.wbur.org/onpoint/podcast.xml --start-time=2023-12-01
+func runFetchCmd(ccmd *cobra.Command, args []string) {
+	fromTime := parseTime(fromTime)
+	toTime := parseTime(toTime)
+
+	allEpisodesToFetch := []FeedEpisodesToFetch{}
+	if len(args) > 0 {
+		feedUrl := args[0]
+		allEpisodesToFetch = prepareEpisodesFetchForFeeds([]string{feedUrl}, fromTime, toTime)
+	} else {
+		feedUrls := []string{}
+		for _, feedConfig := range config.ReadFeedConfigs() {
+			feedUrls = append(feedUrls, feedConfig.Feed)
+		}
+		allEpisodesToFetch = prepareEpisodesFetchForFeeds(feedUrls, fromTime, toTime)
+	}
+
+	httpClient := http.HttpClient{}
+	for _, feedEpisodesToFetch := range allEpisodesToFetch {
+		fmt.Printf("Fetching feed %s...\n", feedEpisodesToFetch.feedTitle)
+		feedPath := filepath.Join(downloadDirectory, feedEpisodesToFetch.feedTitle)
+		if _, err := os.Stat(feedPath); os.IsNotExist(err) {
+			os.MkdirAll(feedPath, 0700)
+		}
+		for _, episode := range feedEpisodesToFetch.episodes {
 			url, err := url.Parse(episode.Enclosure.Url)
 			if err != nil {
 				println(fmt.Errorf("Not parsable url %s", episode.Enclosure.Url))
 			}
 			name := episode.Title + path.Ext(url.Path)
-			fmt.Printf("Downloading \"%s\": episode \"%s\" published on %s\n", feed.Title, name, episode.PubDate)
+			fmt.Printf("Downloading \"%s\": episode \"%s\" published on %s\n", feedEpisodesToFetch.feedTitle, name, episode.PubDate)
 			httpClient.DownloadFile(url.String(), filepath.Join(feedPath, name))
 		}
 	}
-	//firstItem := *feed.Items[0]
-	//fmt.Println(firstItem)
+	//TODO: Show the overall progress, which episode of how many episodes is being downloaded, etc.
 }
