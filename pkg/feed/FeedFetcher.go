@@ -6,9 +6,11 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/amoilanen/gopodder/pkg/http"
+	timeutils "github.com/amoilanen/gopodder/pkg/time"
 )
 
 type FeedFetcher struct {
@@ -28,10 +30,7 @@ func (f *FeedFetcher) prepareFeedEpisodesFetch(feedUrl string, fromTime time.Tim
 	}
 	episodesToFetch := []*RssItem{}
 	for _, episode := range parsedFeed.Items {
-		episodeDate, err := time.Parse(time.RFC1123, episode.PubDate)
-		if err != nil {
-			panic(err)
-		}
+		episodeDate := timeutils.ParseTime(episode.PubDate)
 		if episodeDate.After(fromTime) && episodeDate.Before(toTime) {
 			episodesToFetch = append(episodesToFetch, episode)
 		}
@@ -60,7 +59,7 @@ func (f *FeedFetcher) fetch(downloadDirectory string, feedEpisodes []FeedEpisode
 			if err != nil {
 				println(fmt.Errorf("Not parsable url %s", episode.Enclosure.Url))
 			}
-			name := episode.Title + path.Ext(url.Path)
+			name := strings.TrimSpace(episode.Title + path.Ext(url.Path))
 			fmt.Printf("Downloading \"%s\": episode \"%s\" published on %s\n", feedEpisodesToFetch.FeedTitle, name, episode.PubDate)
 			httpClient.DownloadFile(url.String(), filepath.Join(feedPath, name))
 		}

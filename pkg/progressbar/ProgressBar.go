@@ -14,6 +14,7 @@ type ProgressBar struct {
 	completed int64
 }
 
+// TODO: Add the ability to also show the speed of the download i.e. MBit/s
 func (p *ProgressBar) OnProgress(completed int64) {
 	p.completed += completed
 	if p.Total > 0 {
